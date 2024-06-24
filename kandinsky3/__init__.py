@@ -9,6 +9,7 @@ from kandinsky3.movq import MoVQ
 from kandinsky3.condition_encoders import T5TextConditionEncoder
 from kandinsky3.condition_processors import T5TextConditionProcessor
 from kandinsky3.model.diffusion import BaseDiffusion, get_named_beta_schedule
+from accelerate import cpu_offload
 
 from .t2i_pipeline import Kandinsky3T2IPipeline
 from .inpainting_pipeline import Kandinsky3InpaintingPipeline
@@ -17,7 +18,7 @@ from .inpainting_pipeline import Kandinsky3InpaintingPipeline
 def get_T2I_unet(
         device: Union[str, torch.device],
         weights_path: Optional[str] = None,
-        dtype: Union[str, torch.dtype] = torch.float32,
+        dtype: Union[str, torch.dtype] = torch.float32, low_vram = False
 ) -> (UNet, Optional[torch.Tensor], Optional[dict]):
     unet = UNet(
         model_channels=384,
@@ -41,7 +42,8 @@ def get_T2I_unet(
         null_embedding = state_dict['null_embedding']
         unet.load_state_dict(state_dict['unet'])
 
-    unet.to(device=device, dtype=dtype).eval()
+    # unet.to(device=device, dtype=dtype).eval()
+    cpu_offload(unet, device, offload_buffers=True)
     return unet, null_embedding
 
 
@@ -58,7 +60,7 @@ def get_T5encoder(
     context_dim = 4096
     processor = T5TextConditionProcessor(tokens_length, weights_path)
     condition_encoder = T5TextConditionEncoder(
-        weights_path, context_dim, low_cpu_mem_usage=low_cpu_mem_usage, device=device,
+        weights_path, context_dim, low_cpu_mem_usage=low_cpu_mem_usage,
         dtype=dtype, load_in_8bit=load_in_8bit, load_in_4bit=load_in_4bit
     )
 
@@ -67,7 +69,8 @@ def get_T5encoder(
         state_dict = torch.load(projections_weights_path, map_location=torch.device('cpu'))
         condition_encoder.projection.load_state_dict(state_dict)
 
-    condition_encoder.projection.to(device=device, dtype=dtype).eval()
+    # condition_encoder.projection.to(device=device, dtype=dtype).eval()
+    cpu_offload(condition_encoder, device, offload_buffers=True)
     return processor, condition_encoder
 
 
@@ -91,10 +94,13 @@ def get_movq(
     movq = MoVQ(generator_config)
 
     if weights_path:
-        state_dict = torch.load(weights_path, map_location=torch.device('cpu'))
+        state_dict = torch.load(weights_path,
+                                # map_location=torch.device('cpu')
+                               )
         movq.load_state_dict(state_dict)
 
-    movq.to(device=device, dtype=dtype).eval()
+    # movq.to(device=device, dtype=dtype).eval()
+    cpu_offload(movq, device, offload_buffers=True)
     return movq
 
 
@@ -121,11 +127,13 @@ def get_inpainting_unet(
 
     null_embedding = None
     if weights_path:
-        state_dict = torch.load(weights_path, map_location=torch.device('cpu'))
+        state_dict = torch.load(weights_path,
+                                # map_location=torch.device('cpu')
+                               )
         null_embedding = state_dict['null_embedding']
         unet.load_state_dict(state_dict['unet'])
 
-    unet.to(device=device, dtype=dtype).eval()
+    # unet.to(device=device, dtype=dtype).eval()
     return unet, null_embedding
 
 

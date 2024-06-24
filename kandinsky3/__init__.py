@@ -71,7 +71,7 @@ def get_T5encoder(
 
     # condition_encoder.projection.to(device=device, dtype=dtype).eval()
     cpu_offload(condition_encoder, device, offload_buffers=True)
-    cpu_offload(processor, device, offload_buffers=True)
+    # cpu_offload(processor, device, offload_buffers=True)
     return processor, condition_encoder
 
 

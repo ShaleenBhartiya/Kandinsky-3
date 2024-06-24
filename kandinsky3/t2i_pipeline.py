@@ -58,15 +58,11 @@ class Kandinsky3T2IPipeline:
 
         condition_model_input, negative_condition_model_input = self.t5_processor.encode(text, negative_text)
         for input_type in condition_model_input:
-            condition_model_input[input_type] = condition_model_input[input_type][None].to(
-                self.device_map['text_encoder']
-            )
+            condition_model_input[input_type] = condition_model_input[input_type][None]
 
         if negative_condition_model_input is not None:
             for input_type in negative_condition_model_input:
-                negative_condition_model_input[input_type] = negative_condition_model_input[input_type][None].to(
-                    self.device_map['text_encoder']
-                )
+                negative_condition_model_input[input_type] = negative_condition_model_input[input_type][None]
 
         pil_images = []
         with torch.no_grad():

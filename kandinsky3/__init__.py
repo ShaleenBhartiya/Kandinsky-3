@@ -43,7 +43,8 @@ def get_T2I_unet(
         unet.load_state_dict(state_dict['unet'])
 
     # unet.to(device=device, dtype=dtype).eval()
-    cpu_offload(unet, device, offload_buffers=True)
+    if low_vram:
+        cpu_offload(unet, device, offload_buffers=True)
     return unet, null_embedding
 
 
@@ -70,7 +71,8 @@ def get_T5encoder(
         condition_encoder.projection.load_state_dict(state_dict)
 
     # condition_encoder.projection.to(device=device, dtype=dtype).eval()
-    cpu_offload(condition_encoder, device, offload_buffers=True)
+    if low_vram:
+        cpu_offload(condition_encoder, device, offload_buffers=True)
     return processor, condition_encoder
 
 
@@ -100,7 +102,8 @@ def get_movq(
         movq.load_state_dict(state_dict)
 
     # movq.to(device=device, dtype=dtype).eval()
-    cpu_offload(movq, device, offload_buffers=True)
+    if low_vram:
+        cpu_offload(movq, device, offload_buffers=True)
     return movq
 
 

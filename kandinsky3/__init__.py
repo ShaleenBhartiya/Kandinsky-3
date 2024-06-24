@@ -42,8 +42,8 @@ def get_T2I_unet(
         null_embedding = state_dict['null_embedding']
         unet.load_state_dict(state_dict['unet'])
 
-    # unet.to(device=device, dtype=dtype).eval()
-    cpu_offload(unet, device, offload_buffers=True)
+    unet.to(device=device, dtype=dtype).eval()
+    # cpu_offload(unet, device, offload_buffers=True)
     return unet, null_embedding
 
 

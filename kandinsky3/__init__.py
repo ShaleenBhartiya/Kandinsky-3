@@ -18,7 +18,7 @@ from .inpainting_pipeline import Kandinsky3InpaintingPipeline
 def get_T2I_unet(
         device: Union[str, torch.device],
         weights_path: Optional[str] = None,
-        dtype: Union[str, torch.dtype] = torch.float32, low_vram = False
+        dtype: Union[str, torch.dtype] = torch.float32, low_vram = True
 ) -> (UNet, Optional[torch.Tensor], Optional[dict]):
     unet = UNet(
         model_channels=384,

@@ -1,5 +1,6 @@
 from typing import Union, List
 import PIL
+from accelerate import cpu_offload
 
 import torch
 import torchvision.transforms as T
@@ -36,6 +37,23 @@ class Kandinsky3T2IPipeline:
         self.movq = movq
 
         self.gan = gan
+
+        modules = [self.unet, self.null_embedding, self.t5_processor, self.t5_encoder, self.movq]
+
+        torch_device = torch.device('cuda:0')
+        
+        for model in modules:
+            if not isinstance(model, torch.nn.Module):
+                continue
+
+            else:
+                # make sure to offload buffers if not all high level weights
+                # are of type nn.Module
+                offload_buffers = len(model._parameters) > 0
+                cpu_offload(model, torch_device, offload_buffers=offload_buffers)
+
+
+        # cpu_offload(processor, device, offload_buffers=True)
 
     def __call__(
             self,

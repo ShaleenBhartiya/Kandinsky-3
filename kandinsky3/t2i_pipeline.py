@@ -38,7 +38,7 @@ class Kandinsky3T2IPipeline:
 
         self.gan = gan
 
-        modules = [self.unet, self.null_embedding, self.t5_processor, self.t5_encoder, self.movq]
+        modules = [self.unet, self.null_embedding, self.t5_processor, self.t5_encoder, self.movq, self.gan]
 
         torch_device = torch.device('cuda:0')
         

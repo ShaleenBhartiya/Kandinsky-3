@@ -46,9 +46,6 @@ class Kandinsky3T2IPipeline:
             if not isinstance(model, torch.nn.Module):
                 continue
             else:
-                model.to('cpu')
-
-            else:
                 # make sure to offload buffers if not all high level weights
                 # are of type nn.Module
                 offload_buffers = len(model._parameters) > 0

@@ -43,7 +43,6 @@ def get_T2I_unet(
         unet.load_state_dict(state_dict['unet'])
 
     # unet.to(device=device, dtype=dtype).eval()
-    cpu_offload(unet, device)
     return unet, null_embedding
 
 
@@ -70,7 +69,7 @@ def get_T5encoder(
         condition_encoder.projection.load_state_dict(state_dict)
 
     # condition_encoder.projection.to(device=device, dtype=dtype).eval()
-    cpu_offload(condition_encoder, device)
+    # cpu_offload(condition_encoder, device)
     # cpu_offload(processor, device, offload_buffers=True)
     return processor, condition_encoder
 
@@ -101,7 +100,7 @@ def get_movq(
         movq.load_state_dict(state_dict)
 
     # movq.to(device=device, dtype=dtype).eval()
-    cpu_offload(movq, device)
+    # cpu_offload(movq, device)
     return movq
 
 
@@ -135,7 +134,7 @@ def get_inpainting_unet(
         unet.load_state_dict(state_dict['unet'])
 
     # unet.to(device=device, dtype=dtype).eval()
-    cpu_offload(unet, device)
+    # cpu_offload(unet, device)
     return unet, null_embedding
 
 
